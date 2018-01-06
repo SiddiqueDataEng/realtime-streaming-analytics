@@ -1,0 +1,121 @@
+# Real-Time Streaming Analytics Configuration
+
+# Kafka Configuration
+kafka:
+  bootstrap_servers: "localhost:9092"
+  topics:
+    input: "events"
+    output: "metrics"
+    alerts: "alerts"
+  consumer_group: "streaming-analytics"
+  auto_offset_reset: "latest"
+
+# Spark Streaming Configuration
+spark:
+  app_name: "RealTimeAnalytics"
+  master: "local[*]"
+  checkpoint_location: "/tmp/checkpoints"
+  
+  streaming:
+    trigger_interval: "10 seconds"
+    max_offsets_per_trigger: 10000
+    
+  config:
+    spark.sql.streaming.checkpointLocation: "/tmp/checkpoints"
+    spark.sql.adaptive.enabled: "true"
+    spark.streaming.stopGracefullyOnShutdown: "true"
+    spark.streaming.backpressure.enabled: "true"
+    spark.streaming.kafka.maxRatePerPartition: 1000
+
+# Processing Configuration
+processing:
+  window_duration: "1 minute"
+  slide_duration: "30 seconds"
+  watermark_delay: "10 minutes"
+  
+  aggregations:
+    - type: "count"
+      column: "*"
+    - type: "avg"
+      column: "latency_ms"
+    - type: "max"
+      column: "latency_ms"
+    - type: "sum"
+      column: "value"
+
+# Alert Configuration
+alerts:
+  enabled: true
+  
+  conditions:
+    error_rate_threshold: 5.0
+    latency_threshold: 1000
+    anomaly_threshold: 100.0
+  
+  severity_levels:
+    critical: 
+      error_rate: 10.0
+      latency: 2000
+    high:
+      error_rate: 7.0
+      latency: 1500
+    medium:
+      error_rate: 5.0
+      latency: 1000
+  
+  notification:
+    channels: ["kafka", "redis"]
+    kafka_topic: "alerts"
+    redis_key_prefix: "alert:"
+
+# Redis Configuration
+redis:
+  host: "localhost"
+  port: 6379
+  db: 0
+  ttl: 3600
+  key_prefix: "streaming:"
+
+# InfluxDB Configuration
+influxdb:
+  url: "http://localhost:8086"
+  token: "your-token"
+  org: "myorg"
+  bucket: "metrics"
+  
+  measurements:
+    - name: "event_metrics"
+      tags: ["event_type"]
+      fields: ["count", "avg_latency", "error_rate"]
+
+# Monitoring Configuration
+monitoring:
+  enabled: true
+  
+  metrics:
+    - name: "events_processed"
+      type: "counter"
+    - name: "processing_latency"
+      type: "histogram"
+    - name: "active_streams"
+      type: "gauge"
+  
+  health_check:
+    interval_seconds: 30
+    timeout_seconds: 10
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+  handlers:
+    console:
+      enabled: true
+      level: "INFO"
+    
+    file:
+      enabled: true
+      filename: "logs/streaming.log"
+      max_bytes: 10485760
+      backup_count: 5

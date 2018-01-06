@@ -1,0 +1,22 @@
+# Real-Time Streaming Analytics - Python Dependencies
+
+# Spark
+pyspark==3.4.0
+
+# Kafka
+kafka-python==2.0.2
+
+# Redis
+redis==4.6.0
+
+# InfluxDB
+influxdb-client==1.37.0
+
+# Configuration
+PyYAML==6.0
+
+# Testing
+pytest==7.4.0
+
+# Utilities
+python-dateutil==2.8.2
